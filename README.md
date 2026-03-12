@@ -3,46 +3,116 @@
 <p align="center"><a href="https://moodle.org" target="_blank" title="Moodle Website">
   <img src="https://raw.githubusercontent.com/moodle/moodle/main/.github/moodlelogo.svg" alt="The Moodle Logo">
 </a></p>
+<br>
+<br>
 
-[Moodle][1] is the World's Open Source Learning Platform, widely used around the world by countless universities, schools, companies, and all manner of organisations and individuals.
+####
 
-Moodle is designed to allow educators, administrators and learners to create personalised learning environments with a single robust, secure and integrated system.
+## Development Setup
 
-## Documentation
+### Table of Contents
 
-- Read our [User documentation][3]
-- Discover our [developer documentation][5]
-- Take a look at our [demo site][4]
+1. [Instructions](#instructions)
+2. [Installations](#1-installations)
+   - [Settings](#settings)
+   - [Data](#data)
+   - [Run](#run)
+3. [MKD: Installing Dependencies (first time)](#2-mkd-installing-dependencies-first-time)
+   - [Install](#install)
+   - [Run MKD](#run-mkd)
+4. [Setting Up for Other Developers (first time)](#3-setting-up-for-other-developers-first-time)
+5. [Automated Bash Script for fast installation](#automated-bash-script-for-fast-installation)
 
-## Community
+<br>
+<hr>
+<br>
 
-[moodle.org][1] is the central hub for the Moodle Community, with spaces for educators, administrators and developers to meet and work together.
+### _Instructions_
 
-You may also be interested in:
+#### 1. Installations
 
-- attending a [Moodle Moot][6]
-- our regular series of [developer meetings][7]
-- the [Moodle User Association][8]
+##### Settings
 
-## Installation and hosting
+```bash
+export MOODLE_DOCKER_DB=pgsql
+export COMPOSE_PROJECT_NAME=moodleNew
+export MOODLE_DOCKER_DB_PORT=5432
+```
 
-Moodle is Free, and Open Source software. You can easily [download Moodle][9] and run it on your own web server, however you may prefer to work with one of our experienced [Moodle Partners][10].
+##### Data
 
-Moodle also offers hosting through both [MoodleCloud][11], and our [partner network][10].
+```bash
+# Clone Moodle repository (change branch as needed, i used MOODLE_405_STABLE )
+git clone -b MOODLE_405_STABLE git://git.moodle.org/moodle.git $MOODLE_DOCKER_WWWROOT
 
-## License
+# Copy Docker config template
+cp config.docker-template.php $MOODLE_DOCKER_WWWROOT/config.php
+```
 
-Moodle is provided freely as open source software, under version 3 of the GNU General Public License. For more information on our license see
+### Run
 
-[1]: https://moodle.org
-[2]: https://moodle.com
-[3]: https://docs.moodle.org/
-[4]: https://sandbox.moodledemo.net/
-[5]: https://moodledev.io
-[6]: https://moodle.com/events/mootglobal/
-[7]: https://moodledev.io/general/community/meetings
-[8]: https://moodleassociation.org/
-[9]: https://download.moodle.org
-[10]: https://moodle.com/partners
-[11]: https://moodle.com/cloud
-[12]: https://moodledev.io/general/license
+```bash
+bin/moodle-docker-compose up -d
+bin/moodle-docker-wait-for-db
+```
+
+<br>
+<hr>
+<br>
+
+#### 2. MKD: Installing Dependencies (first time)
+
+##### Install
+
+```bash
+# System packages
+apt-get update && apt-get install -y python3 python3-pip python3-dev \
+    default-libmysqlclient-dev libpq-dev unixodbc-dev
+
+# Python virtual environment
+apt-get install -y python3.11-venv
+python3 -m venv venv
+source venv/bin/activate
+
+# Install Moodle SDK
+pip install moodle-sdk
+```
+
+##### Run MKD
+
+```bash
+mdk init
+```
+
+<br>
+<hr>
+<br>
+
+#### 3. Setting Up for Other Developers (first time)
+
+```bash
+# Freeze Python dependencies
+pip freeze > requirements.txt
+
+# Save installed system packages
+apt-mark showmanual | xargs dpkg-query -W -f='${Package}=${Version}\n' > system-requirements.txt
+```
+
+<br>
+<hr>
+<br>
+
+#### Automated Bash Script for fast installation
+
+```bash
+#!/bin/bash
+
+# Install system packages
+xargs -a system-requirements.txt apt-get update
+xargs -a system-requirements.txt apt-get install -y
+
+# Activate Python venv and install Python packages
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
