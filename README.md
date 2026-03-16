@@ -30,13 +30,14 @@
    - [open terminal config](#open-terminal-settings)
    - [paste code in it](#add-in-it)
    - [restart terminal](#restart-terminal)
+7. [dev setup](#dev-setups)
 
 <hr>
 <br>
 
 ### _Instructions_
 
-#### 1. Installations
+#### 1. Installations (can be installed using mdk [mdk create])
 
 ##### Settings
 
@@ -270,3 +271,135 @@ source $ZSH/oh-my-zsh.sh
 ```bash
 source ~/.zshrc
 ```
+
+## dev setups
+
+1. MDK - to setup moodle and testing
+2. vs code setup
+   - :
+     - 2.1. PHP Debug - https://marketplace.visualstudio.com/items?itemName=xdebug.php-debug
+     - 2.2. xdebug (not yet setup)
+     - 2.3. PHP Intelephense (only this dont add other intel), and add this to user setting:
+
+     ```json
+        "intelephense.files.maxSize": 1000000,
+        "intelephense.files.associations": ["*.php", "*.phtml"],
+        "intelephense.maxMemory": 8192, // in MB
+        "intelephense.environment.shortOpenTag": true,
+        "intelephense.diagnostics.enable": true,
+        "intelephense.diagnostics.embeddedLanguages": true,
+        "intelephense.diagnostics.implementationErrors": true,
+        "intelephense.diagnostics.languageConstraints": true,
+        "intelephense.rename.exclude": ["**/vendor/**"],
+        "intelephense.rename.namespaceMode": "single",
+        "intelephense.codeLens.references.enable": true,
+        "intelephense.codeLens.implementations.enable": true,
+        "intelephense.codeLens.overrides.enable": true,
+        "intelephense.codeLens.parent.enable": true,
+        "intelephense.files.exclude": [
+           "**/.git/**",
+           "**/.svn/**",
+           "**/.hg/**",
+           "**/node_modules/**",
+
+           // Magento
+           "**/generated/**",
+           "**/var/**",
+           "**/pub/static/**",
+           "**/pub/media/**",
+
+           // Moodle
+           "**/moodledata/**",
+           "**/cache/**",
+           "**/localcache/**",
+           "**/temp/**",
+           "**/sessions/**",
+        ],
+        "files.watcherExclude": {
+           "**/.git/**": true,
+           "**/node_modules/**": true,
+
+           // Magento
+           "**/generated/**": true,
+           "**/var/**": true,
+           "**/pub/static/**": true,
+           "**/pub/media/**": true,
+
+           // Moodle
+           "**/moodledata/**": true,
+           "**/cache/**": true,
+           "**/localcache/**": true,
+           "**/temp/**": true,
+           "**/sessions/**": true,
+        },
+        "intelephense.stubs": [
+           "apache",
+           "bcmath",
+           "Core",
+           "curl",
+           "date",
+           "dom",
+           "fileinfo",
+           "filter",
+           "gd",
+           "hash",
+           "iconv",
+           "json",
+           "mbstring",
+           "mysqli",
+           "openssl",
+           "pdo",
+           "pdo_mysql",
+           "standard",
+           "xml",
+           "zip",
+        ],
+     ```
+
+     - 2.4. Linting:
+       - ESLint
+       - Stylelint
+       - PHP Sniffer
+
+     - 2.4.1. PHP Sniffer & Beautifier - https://marketplace.visualstudio.com/items?itemName=ValeryanM.vscode-phpsab , and install code sniffer to make it works:
+
+     ```bash
+        # for just this project
+        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+        php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+        php composer-setup.php
+        php composer.phar require --dev squizlabs/php_codesniffer
+        export PATH="$HOME/.composer/vendor/bin:$PATH"
+
+        # make sure it installed
+        php -r "if (hash_file('sha384', 'composer-setup.php') === file_get_contents('https://composer.github.io/installer.sig')) { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"\n
+
+        ./vendor/bin/phpcs -v
+        ./vendor/bin/phpcs -i
+
+         # add it to setting.json:
+           "phpsab.executablePathCS": "${workspaceFolder}/vendor/bin/phpcs",
+            "phpsab.executablePathCBF": "${workspaceFolder}/vendor/bin/phpcbf",
+            "phpsab.autoRulesetSearch": true,
+            "phpsab.snifferMode": "onSave",
+            "phpsab.fixerEnable": true,
+            "phpsab.snifferShowSources": true,
+
+         # for future needs to get /moodle-coding-standard (https://docs.moodle.org/dev/Setting_up_VSCode)
+         composer global require moodlehq/moodle-cs
+         composer require --dev squizlabs/php_codesniffer
+         ./vendor/bin/phpcs --config-set installed_paths ~/.config/composer/vendor/moodlehq/moodle-cs
+
+     ```
+
+     - 2.5. Automated testing:
+       - PHPUnit & Pest Test Explorer
+
+     - 2.6. Docs:
+       - JSDoc Generator
+       - PHP DocBlocker
+
+     - 2.7. remote connections:
+       - Dev Containers
+       - Remote - SSH && Remote - SSH: Editing Configuration Files
+       - Remote Explorer
