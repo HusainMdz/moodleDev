@@ -361,7 +361,7 @@ source ~/.zshrc
        - Stylelint
        - PHP Sniffer
 
-     - 2.4.1. PHP Sniffer & Beautifier - https://marketplace.visualstudio.com/items?itemName=ValeryanM.vscode-phpsab , and install code sniffer to make it works:
+     - 2.4.1. PHP Sniffer & Beautifier - https://marketplace.visualstudio.com/items?itemName=ValeryanM.vscode-phpsab , and install code sniffer to make it works (this step may not need to do as it come with the codeCher):
 
      ```bash
         # for just this project
@@ -395,7 +395,7 @@ source ~/.zshrc
      - 2.5. Automated testing:
        - PHPUnit & Pest Test Explorer
 
-     - 2.6. Docs:
+     - 2.6. Docs (works by typing /\*\* ?):
        - JSDoc Generator
        - PHP DocBlocker
 
@@ -403,3 +403,12 @@ source ~/.zshrc
        - Dev Containers
        - Remote - SSH && Remote - SSH: Editing Configuration Files
        - Remote Explorer
+
+     - 2.8. codeChecker
+       ```bash
+          git clone https://github.com/moodlehq/moodle-local_codechecker.git local/codechecker
+       ```
+     - 2.9. skeleton generator
+       ```bash
+          git clone https://github.com/mudrd8mz/moodle-tool_pluginskel.git admin/tool/pluginskel
+       ```
