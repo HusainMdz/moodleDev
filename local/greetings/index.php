@@ -20,7 +20,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require('../../config.php');
+use core\plugininfo\format;
+
+require_once('../../config.php');
+require_once($CFG->dirroot . '/local/greetings/lib.php');
 
 require_login();
 
@@ -49,9 +52,26 @@ echo $OUTPUT->header();
 //  2. make mustache template, to display the data in a formatted way.
 //  3. pass the data to template.
 //  4. render the template (render_from_template).
-$usergreeting = 'Greetings, ' . fullname($USER);
+
+// $usergreeting = 'Greetings, ' . fullname($USER);
+// $usergreeting = get_string('greetingloggedinuser', 'local_greetings', fullname($USER)); // needs to do purge to lang cache, cuse the sting add to lang and lag in the cache dont change
+
+$usergreeting = local_greetings_get_greeting_msg($USER);
+
 $templatedata = ['usergreeting' => $usergreeting];
 echo $OUTPUT->render_from_template('local_greetings/greeting_msg', $templatedata);
+
+
+// display today's date
+echo userdate(time(), get_string('strftimedate', 'core_langconfig')) . '<br>';
+
+// display tomorrow's date
+$date = new DateTime("tomorrow", core_date::get_server_timezone_object());
+$date->setTime(0, 0, 0,);
+echo userdate($date->getTimestamp(), get_string('strftimedatefullshort', 'core_langconfig'));
+
+// display a formatted float number
+echo '<br>' . format_float(20.00 / 3) . '';
 
 // End of body content.
 echo $OUTPUT->footer();
