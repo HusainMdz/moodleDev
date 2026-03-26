@@ -19,7 +19,7 @@
  *
  * @package     local_greetings
  * @category    string
- * @copyright   2026 Husain husain.alabed@mindzer.com
+ * @copyright   2026 Husain husain@test.com
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
