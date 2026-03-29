@@ -25,23 +25,18 @@ use core\plugininfo\format;
 require_once('../../config.php');
 require_once($CFG->dirroot . '/local/greetings/lib.php');
 
+defined('MOODLE_INTERNAL') || die();
 require_login();
 
 $url = new moodle_url('/local/greetings/index.php', []);
-
-// Url setup.
 $PAGE->set_url($url);
 $PAGE->set_context(context_system::instance());
 
-// Layout management.
 $PAGE->set_pagelayout('standard');
-
-// Tab(browser tab) title.
 $PAGE->set_title(get_string('pluginname', 'local_greetings'));
-
-
-// Title on the page.
 $PAGE->set_heading(get_string('pluginname', 'local_greetings'));
+
+$messageform = new \local_greetings\form\message_form();
 
 // The start of body content.
 echo $OUTPUT->header();
@@ -72,6 +67,13 @@ echo userdate($date->getTimestamp(), get_string('strftimedatefullshort', 'core_l
 
 // display a formatted float number
 echo '<br>' . format_float(20.00 / 3) . '';
+
+$messageform->display();
+if ($data = $messageform->get_data()) {
+$message = required_param('message', PARAM_TEXT);
+echo $OUTPUT->heading($message, 4);
+
+}
 
 // End of body content.
 echo $OUTPUT->footer();
