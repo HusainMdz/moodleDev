@@ -37,6 +37,7 @@ $PAGE->set_title(get_string('pluginname', 'local_greetings'));
 $PAGE->set_heading(get_string('pluginname', 'local_greetings'));
 
 $messageform = new \local_greetings\form\message_form();
+$agefrom = new \local_greetings\form\age_msg();
 
 // The start of body content.
 echo $OUTPUT->header();
@@ -69,11 +70,20 @@ echo userdate($date->getTimestamp(), get_string('strftimedatefullshort', 'core_l
 echo '<br>' . format_float(20.00 / 3) . '';
 
 $messageform->display();
-if ($data = $messageform->get_data()) {
-$message = required_param('message', PARAM_TEXT);
-echo $OUTPUT->heading($message, 4);
 
+if ($data = $messageform->get_data()) {
+    $message = required_param('message', PARAM_TEXT);
+    echo $OUTPUT->heading($message, 4);
 }
+
+// $agefrom->display();  -- vlidation resions
+if ($data = $agefrom->get_data()) {
+    echo $OUTPUT->notification("Form submitted successfully! Age: " . $data->age, 'notifysuccess');
+} else {
+    $agefrom->display();
+}
+
+
 
 // End of body content.
 echo $OUTPUT->footer();
