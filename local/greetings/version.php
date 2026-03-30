@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_greetings';
 $plugin->release = '0.1.0';
-$plugin->version = 2026031700;
+$plugin->version = 2026031701;
 $plugin->requires = 2019111803;
 $plugin->maturity = MATURITY_ALPHA;
