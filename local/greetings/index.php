@@ -53,7 +53,7 @@ echo $OUTPUT->header();
 // $usergreeting = get_string('greetingloggedinuser', 'local_greetings', fullname($USER)); // needs to do purge to lang cache, cuse the sting add to lang and lag in the cache dont change
 
 $usergreeting = local_greetings_get_greeting_msg($USER);
-
+// print_r($USER);
 $templatedata = ['usergreeting' => $usergreeting];
 echo $OUTPUT->render_from_template('local_greetings/greeting_msg', $templatedata);
 
@@ -71,6 +71,7 @@ echo '<br>' . format_float(20.00 / 3) . '';
 
 $messageform->display();
 
+// Handle form submission. with DB insert.
 if ($data = $messageform->get_data()) {
     $message = required_param('message', PARAM_TEXT);
 
@@ -83,6 +84,8 @@ if ($data = $messageform->get_data()) {
         $DB->insert_record('local_greetings_messages', $record);
     }
 }
+
+// Fetch messages with user information.
 $context = \context_system::instance();
 $userfields = \core_user\fields::for_name()->with_identity($context);
 $userfieldssql = $userfields->get_sql('u');
@@ -93,6 +96,8 @@ $sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects
       ORDER BY timecreated DESC";
 
 $messages = $DB->get_records_sql($sql);
+
+
 
 $templatedata = ['messages' => array_values($messages)];
 echo $OUTPUT->render_from_template('local_greetings/messages', $templatedata);
