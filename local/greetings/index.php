@@ -26,15 +26,23 @@ require_once('../../config.php');
 require_once($CFG->dirroot . '/local/greetings/lib.php');
 
 defined('MOODLE_INTERNAL') || die();
+$context = \context_system::instance();
+
 require_login();
+// if (isguestuser()) {
+//     throw new moodle_exception('noguest');
+// }
 
 $url = new moodle_url('/local/greetings/index.php', []);
 $PAGE->set_url($url);
-$PAGE->set_context(context_system::instance());
+$PAGE->set_context($context);
 
 $PAGE->set_pagelayout('standard');
 $PAGE->set_title(get_string('pluginname', 'local_greetings'));
 $PAGE->set_heading(get_string('pluginname', 'local_greetings'));
+
+$allowpost = has_capability('local/greetings:postmessages', $context);
+$deleteanypost = has_capability('local/greetings:deleteanymessage', $context);
 
 $messageform = new \local_greetings\form\message_form();
 $agefrom = new \local_greetings\form\age_msg();
@@ -69,10 +77,13 @@ echo userdate($date->getTimestamp(), get_string('strftimedatefullshort', 'core_l
 // display a formatted float number
 echo '<br>' . format_float(20.00 / 3) . '';
 
-$messageform->display();
+if ($allowpost) {
+    $messageform->display();
+}
 
 // Handle form submission. with DB insert.
 if ($data = $messageform->get_data()) {
+    require_capability('local/greetings:postmessages', $context);
     $message = required_param('message', PARAM_TEXT);
 
     if (!empty($message)) {
@@ -86,7 +97,6 @@ if ($data = $messageform->get_data()) {
 }
 
 // Fetch messages with user information.
-$context = \context_system::instance();
 $userfields = \core_user\fields::for_name()->with_identity($context);
 $userfieldssql = $userfields->get_sql('u');
 
@@ -99,9 +109,20 @@ $messages = $DB->get_records_sql($sql);
 
 
 
-$templatedata = ['messages' => array_values($messages)];
+$templatedata = [
+    'messages' => array_values($messages),
+    'candeleteany' => $deleteanypost,
+];
 echo $OUTPUT->render_from_template('local_greetings/messages', $templatedata);
+$action = optional_param('action', '', PARAM_TEXT);
 
+if ($action == 'del') {
+    require_capability('local/greetings:deleteanymessage', $context);
+    $id = required_param('id', PARAM_INT);
+    if ($deleteanypost) {
+        $DB->delete_records('local_greetings_messages', ['id' => $id]);
+    }
+}
 
 // $agefrom->display();  -- vlidation resions
 if ($data = $agefrom->get_data()) {
