@@ -27,6 +27,11 @@ use function PHPUnit\Framework\isNull;
 
 function local_greetings_get_greeting_msg($user)
 {
+    if (is_null($user)) {
+        // You MUST pass a placeholder value here too, even if it's empty
+        // so that {$a} is replaced by nothing instead of staying as "{$a}"
+        return get_string('greetingloggedinuser', 'local_greetings', '');
+    }
     $countery = $user->country;
     switch ($countery) {
         case 'AU':
