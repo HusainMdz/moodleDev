@@ -23,9 +23,16 @@
             <p class="card-text">{{#str}} postedby, local_greetings, {{firstname}} {{/str}}</p>
             {{#candeleteany}}
                 <p class="card-footer text-center">
-                    <a href="{{config.wwwroot}}/local/greetings/index.php?action=del&id={{id}}">
-                        {{#pix}} t/delete {{/pix}}{{#str}} delete {{/str}}
-                    </a>
+                    <form action="{{config.wwwroot}}/local/greetings/index.php" method="post">
+                        <input type="hidden" name="sesskey" value="{{config.sesskey}}">
+                        <input type="hidden" name="action" value="del">
+                        <input type="hidden" name="id" value="{{id}}">
+                        
+                        <button type="submit" class="btn btn-link p-0 m-0 border-0 align-baseline">
+                            {{#pix}} t/delete, core {{/pix}}
+                            {{#str}} delete {{/str}}
+                        </button>
+                    </form>
                 </p>
             {{/candeleteany}}
             <p class="card-text">

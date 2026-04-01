@@ -47,7 +47,54 @@ $deleteanypost = has_capability('local/greetings:deleteanymessage', $context);
 $messageform = new \local_greetings\form\message_form();
 $agefrom = new \local_greetings\form\age_msg();
 
-// The start of body content.
+
+// Handle delete action.
+$action = optional_param('action', '', PARAM_TEXT);
+if ($action == 'del') {
+    require_sesskey();
+    require_capability('local/greetings:deleteanymessage', $context);
+    $id = required_param('id', PARAM_INT);
+    if ($deleteanypost) {
+        $DB->delete_records('local_greetings_messages', ['id' => $id]);
+    }
+    redirect($PAGE->url, 'Greeting deleted successfully', 2);
+}
+
+
+// Handle form submission. with DB insert.
+if ($data = $messageform->get_data()) {
+    require_capability('local/greetings:postmessages', $context);
+    $message = required_param('message', PARAM_RAW);
+
+    if (!empty($message)) {
+        $record = new stdClass;
+        $record->message = $message;
+        $record->timecreated = time();
+        $record->userid = $USER->id;
+
+        $DB->insert_record('local_greetings_messages', $record);
+    }
+}
+
+
+
+
+// Fetch messages with user information.
+$userfields = \core_user\fields::for_name()->with_identity($context);
+$userfieldssql = $userfields->get_sql('u');
+
+$sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects}
+          FROM {local_greetings_messages} m
+     LEFT JOIN {user} u ON u.id = m.userid
+      ORDER BY timecreated DESC";
+
+$messages = $DB->get_records_sql($sql);
+
+
+
+
+
+// The start of body content(only display in here)
 echo $OUTPUT->header();
 
 
@@ -81,56 +128,20 @@ if ($allowpost) {
     $messageform->display();
 }
 
-// Handle form submission. with DB insert.
-if ($data = $messageform->get_data()) {
-    require_capability('local/greetings:postmessages', $context);
-    $message = required_param('message', PARAM_TEXT);
-
-    if (!empty($message)) {
-        $record = new stdClass;
-        $record->message = $message;
-        $record->timecreated = time();
-        $record->userid = $USER->id;
-
-        $DB->insert_record('local_greetings_messages', $record);
-    }
-}
-
-// Fetch messages with user information.
-$userfields = \core_user\fields::for_name()->with_identity($context);
-$userfieldssql = $userfields->get_sql('u');
-
-$sql = "SELECT m.id, m.message, m.timecreated, m.userid {$userfieldssql->selects}
-          FROM {local_greetings_messages} m
-     LEFT JOIN {user} u ON u.id = m.userid
-      ORDER BY timecreated DESC";
-
-$messages = $DB->get_records_sql($sql);
-
-
-
+// Display messages using template.
 $templatedata = [
     'messages' => array_values($messages),
     'candeleteany' => $deleteanypost,
 ];
 echo $OUTPUT->render_from_template('local_greetings/messages', $templatedata);
-$action = optional_param('action', '', PARAM_TEXT);
 
-if ($action == 'del') {
-    require_capability('local/greetings:deleteanymessage', $context);
-    $id = required_param('id', PARAM_INT);
-    if ($deleteanypost) {
-        $DB->delete_records('local_greetings_messages', ['id' => $id]);
-    }
-}
-
-// $agefrom->display();  -- vlidation resions
+// Display age form and handle submission.
+// $agefrom->display();  -- vlidation resions has been removed
 if ($data = $agefrom->get_data()) {
     echo $OUTPUT->notification("Form submitted successfully! Age: " . $data->age, 'notifysuccess');
 } else {
     $agefrom->display();
 }
-
 
 
 // End of body content.
